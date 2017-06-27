@@ -106,8 +106,8 @@ void loop() {
       sumTimeTime += times[j]*times[j];
       //Serial.print("Time: ");
       //Serial.print(times[j]);
-      Serial.print("  Dist: ");
-      Serial.println(set[j]);
+      //Serial.print("  Dist: ");
+      //Serial.println(set[j]);
     }
     slope = (i*sumTimeDist - (sumTime*sumDist))/(i*sumTimeTime - (sumTime*sumTime));
 //    Serial.print("sumTimeDist of ");    Serial.println(sumTimeDist);   
@@ -115,8 +115,8 @@ void loop() {
 //    Serial.print("sumDist of ");    Serial.println(sumDist);   
 //    Serial.print("sumTimeTime of ");    Serial.println(sumTimeTime);
     
-    Serial.print("Slope of ");
-    Serial.println(slope);
+    //Serial.print("Slope of ");
+    //Serial.println(slope);
     if(slope > 2) {
       peopleCount++;
       peopleIn++;
@@ -142,6 +142,7 @@ void loop() {
      sf.transmit(stringout, strlen(stringout));
      lastCount = peopleCount;
      sf.deepSleep();
+     Serial.println("TRANSMIT");
   }
   
   if(current_ms - lastRefresh > LineRefresh_ms) {
