@@ -68,7 +68,7 @@ Serial.println("HERE.");
   Serial.println("ready.");
   sf.begin();
   char stringout[8];
-  sprintf(stringout, "%04d%04d%04d", peopleCount, peopleIn, peopleOut);  
+  sprintf(stringout, "%04d", peopleCount);  
   sf.transmit(stringout, strlen(stringout));
   lastCount = peopleCount;
   sf.deepSleep();
@@ -138,7 +138,7 @@ void loop() {
   if((millis() - last_person_ms > transmitTime) && peopleCount != lastCount) {
      sf.deepSleepWakeup();
      char stringout[8];
-     sprintf(stringout, "%04d%04d%04d", peopleCount, peopleIn, peopleOut);  
+     sprintf(stringout, "%04d", peopleCount);  
      sf.transmit(stringout, strlen(stringout));
      lastCount = peopleCount;
      sf.deepSleep();
