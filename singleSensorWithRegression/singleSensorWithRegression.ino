@@ -1,3 +1,4 @@
+
 #include <Wisol.h>
 
 /*
@@ -16,9 +17,8 @@
 #include <LiquidCrystal.h>
 #include <Wire.h>
 #include <VL53L0X.h>
-#include <EEPROM.h>
 
-WisolSigfox sf(8, 9);
+WisolSigfox sf(8, 9, A1);
 VL53L0X sensor;
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 int peopleCount;
@@ -30,7 +30,7 @@ volatile unsigned long current_ms = 0;
 volatile unsigned long LineRefresh_ms = 500;
 volatile unsigned long lastRefresh = 0;
 volatile unsigned long last_person_ms = 0;
-const long transmitTime = 60*1000;
+const long transmitTime = 300000;
  
 const int reset_pin = 6;
 #define sensor_address 60
@@ -47,7 +47,7 @@ void setup() {
   
   Wire.begin();
 
-  int peopleCount = 0;
+  peopleCount = 0;
   peopleIn = 0;
   peopleOut = 0;
   Serial.begin(9600);
@@ -67,11 +67,13 @@ Serial.println("HERE.");
   sensor.setTimeout(100);
   Serial.println("ready.");
   sf.begin();
-  char stringout[8];
-  sprintf(stringout, "%04d", peopleCount);  
-  sf.transmit(stringout, strlen(stringout));
+  //String stringout = String(peopleCount);
+  char stringout2[4] = {0};
+  sprintf(stringout2, "%04d%04d%04d", peopleCount, peopleIn, peopleOut);
+  sf.transmit(stringout2, strlen(stringout2));
   lastCount = peopleCount;
   sf.deepSleep();
+  Serial.println("Init Complete. Init transmit Complete.");
 }
 
 void loop() {
@@ -134,15 +136,26 @@ void loop() {
   else {
     delay(10);
   }
-  
-  if((millis() - last_person_ms > transmitTime) && peopleCount != lastCount) {
+//  Serial.print("diff: ");
+//  Serial.print(millis() - last_person_ms);
+//  Serial.print("  peopleCount = ");
+//  Serial.print(peopleCount);
+//  Serial.print("  lastcount = ");
+//  Serial.print(lastCount);
+//  Serial.print(" ");
+//  Serial.println(peopleCount != lastCount);
+  if((millis() - last_person_ms > transmitTime) && (peopleCount != lastCount)) {
      sf.deepSleepWakeup();
-     char stringout[8];
-     sprintf(stringout, "%04d", peopleCount);  
-     sf.transmit(stringout, strlen(stringout));
+     delay(50);
+     //String stringout = String(peopleCount);
+     char stringout2[4] = {0};
+     sprintf(stringout2, "%04d%04d%04d", peopleCount, peopleIn, peopleOut);
+      sf.transmit(stringout2, strlen(stringout2));
+     delay(50);
      lastCount = peopleCount;
      sf.deepSleep();
-     Serial.println("TRANSMIT");
+     Serial.println("TRANSMITTED");
+     
   }
   
   if(current_ms - lastRefresh > LineRefresh_ms) {
