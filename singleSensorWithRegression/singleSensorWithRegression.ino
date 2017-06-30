@@ -25,6 +25,7 @@ int peopleCount;
 int peopleIn;
 int peopleOut;
 int lastCount;
+int peakCount;
 
 volatile unsigned long current_ms = 0;
 volatile unsigned long LineRefresh_ms = 500;
@@ -50,6 +51,7 @@ void setup() {
   peopleCount = 0;
   peopleIn = 0;
   peopleOut = 0;
+  peakCount = 0;
   Serial.begin(9600);
   Serial.println("setting up.");
   lcd.begin(16, 2);
@@ -60,7 +62,7 @@ void setup() {
   digitalWrite(reset_pin, HIGH);
   delay(250);
   sensor.setAddress((uint8_t)sensor_address);
-Serial.println("HERE.");
+  Serial.println("HERE.");
   sensor.init(true);
   Serial.println("Starting up");
 
@@ -69,7 +71,7 @@ Serial.println("HERE.");
   sf.begin();
   //String stringout = String(peopleCount);
   char stringout2[4] = {0};
-  sprintf(stringout2, "%04d%04d%04d", peopleCount, peopleIn, peopleOut);
+  sprintf(stringout2, "%04d%04d%04d%04d", peopleCount, peopleIn, peopleOut, peakCount);
   sf.transmit(stringout2, strlen(stringout2));
   lastCount = peopleCount;
   sf.deepSleep();
@@ -124,6 +126,9 @@ void loop() {
       peopleIn++;
       Serial.print("Entered. Count = ");
       Serial.println(peopleCount);
+      if(peakCount < peopleCount) {
+        peakCount = peopleCount;
+      }
     }
     if(slope < -2) {
       peopleCount--;
@@ -149,7 +154,7 @@ void loop() {
      delay(50);
      //String stringout = String(peopleCount);
      char stringout2[4] = {0};
-     sprintf(stringout2, "%04d%04d%04d", peopleCount, peopleIn, peopleOut);
+     sprintf(stringout2, "%04d%04d%04d%04d", peopleCount, peopleIn, peopleOut, peakCount);
       sf.transmit(stringout2, strlen(stringout2));
      delay(50);
      lastCount = peopleCount;
@@ -167,12 +172,16 @@ void loop() {
 void updateLCDLine1() {
   // Update the title bar of the LCD
   lcd.setCursor(0, 0);
-  lcd.print("FMT PPL Counter");
+  lcd.print("PPL CNT: Peak:" + RightJustify(peakCount,2));
 }
 
 void updateLCDLine2() {
   lcd.setCursor(0, 1);
-  lcd.print("Count:" + RightJustify(peopleCount, 3));
+  lcd.print("I:" + RightJustify(peopleIn, 2));
+  lcd.setCursor(4,1);
+  lcd.print(" O:" + RightJustify(peopleOut, 2));// + " T:");// + RightJustify(peopleCount, 2));
+  lcd.setCursor(9,1);
+  lcd.print(" T:" + RightJustify(peopleCount, 2));
   lastRefresh = millis();
 }
 
