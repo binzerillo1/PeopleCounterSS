@@ -42,10 +42,6 @@ void setup() {
   pinMode(A0, OUTPUT);
   digitalWrite(A0, HIGH);
   
-  for(int k = 1; k < 101; k++) {
-    times[k-1] = k;
-  }
-  
   Wire.begin();
 
   peopleCount = 0;
@@ -104,12 +100,12 @@ void loop() {
     long sumTimeTime = 0;
     long slope = 0;
     for(int j = 0; j < i; j++) {
-      sumTimeDist += set[j]*times[j];
-      sumTime += times[j];
+      sumTimeDist += set[j]*(j+1);
+      sumTime += (j+1);
       sumDist += set[j];
-      sumTimeTime += times[j]*times[j];
+      sumTimeTime += (j+1)*(j+1);
       //Serial.print("Time: ");
-      //Serial.print(times[j]);
+      //Serial.print(j+1);
       //Serial.print("  Dist: ");
       //Serial.println(set[j]);
     }
